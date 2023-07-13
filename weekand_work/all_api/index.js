@@ -1,7 +1,9 @@
 const express =require('express');
 const joi =require('joi');
 const users=require('./data');
-const app =express();
+const file =express('fs');
+const users=require('./data');
+
 
 
 const bodyParser= require('body-parser');
