@@ -1,3 +1,7 @@
+// doen't consider this file because this dummy file
+//or un structure file 
+
+
 import express, { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { Sequelize, Model, DataTypes ,Op} from 'sequelize';
