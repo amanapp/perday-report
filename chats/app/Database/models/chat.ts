@@ -1,4 +1,6 @@
 import sequelize from '../dbconnection';
+import Message from './messages'
+
 import { Sequelize, Model, DataTypes ,Op} from 'sequelize'
 
 class chat extends Model {
@@ -40,6 +42,7 @@ chat.init(
 );
 
 chat.sync({ force: true });
+chat.belongsTo(Message, { foreignKey: 'id' });
 
 
 export default chat;
