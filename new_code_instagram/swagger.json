@@ -1,0 +1,52 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "aabhi"
+  },
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "enter the detail of user",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "object",
+            "in": "formData",
+            "type": "object",
+              "items": {
+                  "type":"string"
+              },
+            "required": true,
+            "description": "The enter the user_id & password"
+          }
+         
+        ],
+        "responses": {
+          "200": {
+            "description": "sucessfully login",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                   
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+}
