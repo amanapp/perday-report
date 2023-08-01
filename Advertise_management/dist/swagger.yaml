@@ -1,0 +1,588 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OLX API SAMPLE
+  description: API for an OLX application
+
+paths:
+  /signup:
+    post:
+      summary: Sign up a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Username of the user
+                fullname:
+                  type: string
+                  description: Fullname of the user
+                email:
+                  type: string
+                  format: email
+                  description: Email of the user
+                password:
+                  type: string
+                  description: Password of the user
+                status:
+                  type: boolean
+                  description: User status (active/inactive)
+                profile_pic:
+                  type: string
+                  description: User profile image in base64 encoded format
+                mob:
+                  type: integer
+                  description: Mobile number of the user
+                gender:
+                  type: string
+                  description: Gender of the user
+                Dob:
+                  type: string
+                  format: date
+                  description: Date of birth of the user
+              required:
+                - username
+                - email
+                - password
+
+      responses:
+        "200":
+          description: Successful signup
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  user:
+                    $ref: "#/components/schemas/User"
+        "500":
+          description: Signup failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                  error:
+                    type: object
+                    description: Details of the error
+
+  /login:
+    post:
+      summary: User login
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  format: username
+                  description: username of the user
+                password:
+                  type: string
+                  description: Password of the user
+              required:
+                - username
+                - password
+
+      responses:
+        "201":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  user:
+                    type: object
+                    description: Details of the logged-in user, including token
+                    properties:
+                      token:
+                        type: string
+                        description: JWT token for authentication
+                      user:
+                        $ref: "#/components/schemas/User"
+        "200":
+          description: Invalid Credentials
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Invalid Credentials
+        "500":
+          description: Login failed due to an error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unable to login due to some error!
+
+  /gen_otp:
+    post:
+      summary: Generate OTP
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email of the user
+              required:
+                - email
+
+      responses:
+        "201":
+          description: OTP generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  user:
+                    type: string
+                    description: Email of the user to whom OTP has been generated
+        "200":
+          description: Invalid Credentials
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Invalid Credentials
+        "500":
+          description: OTP generation failed due to an error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unable to Generate OTP due to some error!
+
+  /forget-password:
+    post:
+      summary: Update password using OTP
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email of the user
+                otp:
+                  type: string
+                  description: OTP sent to the user's email
+                newpassword:
+                  type: string
+                  description: New password to be set
+              required:
+                - email
+                - otp
+                - newpassword
+
+      responses:
+        "201":
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  user:
+                    type: string
+                    description: Email of the user whose password has been updated
+                  newpassword:
+                    type: string
+                    description: The new password that has been set
+        "200":
+          description: Invalid OTP or Email
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Invalid OTP or Email
+        "500":
+          description: Password update failed due to an error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unable to update password due to some error!
+
+  /get_user:
+    get:
+      summary: Get user Details
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: username
+          required: true
+          description: user Details
+          schema:
+           type: string
+      responses:
+        "200":
+          description: User details fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        "500":
+          description: Failed to get user due to an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+  /update:
+    put:
+      summary: Update user by token
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: username
+          required: true
+          description: username of the user to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateData"
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  user:
+                    $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        "500":
+          description: Failed to update user due to an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+  /delete:
+    delete:
+      summary: Delete user account
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: username
+                  description: username of the user to delete
+              required:
+                - username
+
+      responses:
+        "200":
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+        "500":
+          description: Failed to delete account due to an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+  /upload/photos:
+    post:
+      summary: Add profile photo
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: Profile photo to upload (JPEG format)
+              required:
+                - photo
+
+      responses:
+        "200":
+          description: Photo uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  blob:
+                    type: string
+                    description: Blob representation of the uploaded photo
+        "400":
+          description: Bad Request - No photo uploaded or multer error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        "500":
+          description: Failed to upload photo due to an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+  
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        
+        username:
+          type: string
+          description: Username of the user
+        fullname:
+          type: string
+          description: FullName of the user
+        email:
+          type: string
+          description: Email of the user
+        Password:
+          type: string
+          description: Email of the user
+        status:
+          type: boolean
+          description: User status (active/inactive)
+        profile_pic:
+          type: string
+          description: URL or path to the user's profile image
+        mob:
+          type: integer
+          description: Mobile number of the user
+        gender:
+          type: string
+          description: Gender of the user
+        Dob:
+          type: string
+          format: date
+          description: Date of birth of the user
+
+    UserUpdateData:
+      type: object
+      properties:
+        
+        fullname:
+          type: string
+          description: FullName of the user
+        status:
+          type: boolean
+          description: User status (active/inactive)
+        profile_pic:
+          type: string
+          description: URL or path to the user's profile image
+        mob:
+          type: integer
+          description: Mobile number of the user
+        gender:
+          type: string
+          description: Gender of the user
+        Dob:
+          type: string
+          format: date
+          description: Date of birth of the user
+
+    AddressData:
+      type: object
+      properties:
+        houseno:
+          type: string
+          description: House number of the address
+        streetno:
+          type: integer
+          description: Street number of the address
+        area:
+          type: string
+          description: Area of the address
+        landmark:
+          type: string
+          description: Landmark near the address
+        city:
+          type: string
+          description: City of the address
+        country:
+          type: string
+          description: Country of the address
+        zip_code:
+          type: integer
+          description: ZIP code of the address
+       
+        status:
+          type: boolean
+          description: Address status (active/inactive)
+        address_type:
+          type: string
+          description: Type of the address
+
+    Address:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Address ID
+        user_id:
+          type: integer
+          description: ID of the user associated with the address
+        houseno:
+          type: string
+          description: House number of the address
+        streetno:
+          type: integer
+          description: Street number of the address
+        area:
+          type: string
+          description: Area of the address
+        landmark:
+          type: string
+          description: Landmark near the address
+        city:
+          type: string
+          description: City of the address
+        country:
+          type: string
+          description: Country of the address
+        zip_code:
+          type: integer
+          description: ZIP code of the address
+        state:
+          type: string
+          description: State of the address
+        status:
+          type: boolean
+          description: Address status (active/inactive)
+        address_type:
+          type: string
+          description: Type of the address
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Category ID
+        name:
+          type: string
+          description: Category name
+
+    
