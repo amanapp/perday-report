@@ -1,0 +1,16 @@
+FROM node:18.16.1-alpine
+WORKDIR /app
+
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+COPY package*.json ./
+ENV key=3000
+
+EXPOSE 3000
+
+# RUN tsc
+
+CMD [ "npm","start" ]
